@@ -92,7 +92,7 @@ export abstract class StylesheetProcessorAbstract {
 
   load_into_window() {
     this.process();
-    this.handle_visibilitychange = (_event) => {
+    this.handle_visibilitychange = _event => {
       if (this.stop) {
         return;
       }
@@ -108,7 +108,7 @@ export abstract class StylesheetProcessorAbstract {
       'visibilitychange',
       this.handle_visibilitychange,
     );
-    this.window.addEventListener('unload', (_event) => {
+    this.window.addEventListener('unload', _event => {
       this.unload_from_window(true);
       // TODO: may be move it to stylesheet-processor.js?
     });
@@ -210,7 +210,7 @@ export abstract class StylesheetProcessorAbstract {
         if (
           Array.prototype.every.call(
             this.window.document.styleSheets,
-            (sheet) =>
+            sheet =>
               this.processed_stylesheets.has(sheet)
               || this.broken_stylesheets.has(sheet)
               || this.self_stylesheets.has(sheet),
@@ -432,7 +432,7 @@ export abstract class StylesheetProcessorAbstract {
       }
       return e;
     }
-    Array.prototype.forEach.call(sheet.cssRules, (rule) => {
+    Array.prototype.forEach.call(sheet.cssRules, rule => {
       this.process_CSSRule(rule, base_url!);
     });
     this.processed_stylesheets.set(sheet, sheet.cssRules.length);
@@ -443,7 +443,7 @@ export abstract class StylesheetProcessorAbstract {
     CSSGroupingRule_v: CSSGroupingRule,
     base_url: string,
   ) {
-    Array.prototype.forEach.call(CSSGroupingRule_v.cssRules, (rule) => {
+    Array.prototype.forEach.call(CSSGroupingRule_v.cssRules, rule => {
       this.process_CSSRule(rule, base_url);
     });
   }
@@ -457,13 +457,15 @@ export abstract class StylesheetProcessorAbstract {
       case 1: // CSSRule.STYLE_RULE
         this.process_CSSStyleRule(CSSRule_v as CSSStyleRule, base_url);
         break;
-      case 3: // CSSRule.IMPORT_RULE
+      case 3: {
+        // CSSRule.IMPORT_RULE
         // this.process_CSSImportRule(CSSRule_v);
-        this.process_CSSStyleSheet(
-          (CSSRule_v as CSSImportRule).styleSheet,
-          base_url,
-        );
+        const importStyleSheet = (CSSRule_v as CSSImportRule).styleSheet;
+        if (importStyleSheet) {
+          this.process_CSSStyleSheet(importStyleSheet, base_url);
+        }
         break;
+      }
       case 4: // CSSRule.MEDIA_RULE
         this.process_CSSGroupingRule(CSSRule_v as CSSMediaRule, base_url);
         break;

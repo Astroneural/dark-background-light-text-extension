@@ -14,16 +14,16 @@ export async function query_style() {
     ext_style.setAttribute('id', 'base-extension-style');
     container.appendChild(ext_style);
   }
-  ext_style.textContent = await css_promise;
+  ext_style.textContent = (await css_promise) as string;
 }
 if (document.readyState === 'loading') {
   document.addEventListener(
     'readystatechange',
-    (_event) => {
-      query_style().catch((rejection) => console.error(rejection));
+    _event => {
+      query_style().catch(rejection => console.error(rejection));
     },
     { once: true },
   );
 } else {
-  query_style().catch((rejection) => console.error(rejection));
+  query_style().catch(rejection => console.error(rejection));
 }

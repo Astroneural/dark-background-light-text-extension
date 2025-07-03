@@ -26,10 +26,6 @@ export interface AddonOptions {
   default_method: MethodIndex;
   default_foreground_color: string;
   default_background_color: string;
-  default_link_color: string;
-  default_visited_color: string;
-  default_active_color: string;
-  default_selection_color: string;
   do_not_set_overrideDocumentColors_to_never: boolean;
   configured_pages: ConfiguredPages;
 }
@@ -79,12 +75,7 @@ export type Preferences = (
 export interface RenderOptions {
   default_foreground_color: string;
   default_background_color: string;
-  default_link_color: string;
-  default_visited_color: string;
-  default_active_color: string;
-  default_selection_color: string;
   is_toplevel: boolean;
-  is_darkbg: boolean;
 }
 
 export interface StylesheetRendererBare {

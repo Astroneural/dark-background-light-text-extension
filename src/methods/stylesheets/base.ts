@@ -4,42 +4,23 @@ export const name = 'base';
 export function render({
   default_foreground_color,
   default_background_color,
-  default_link_color,
-  default_visited_color,
-  default_active_color,
-  default_selection_color,
   is_toplevel,
-  is_darkbg,
 }: RenderOptions): string {
   return `
 :root {
   --dark-background-light-text-add-on-foreground-color: ${default_foreground_color} !important;
   --dark-background-light-text-add-on-background-color: ${default_background_color} !important;
-  --dark-background-light-text-add-on-link-color: ${default_link_color} !important;
-  --dark-background-light-text-add-on-visited-color: ${default_visited_color} !important;
-  --dark-background-light-text-add-on-active-color: ${default_active_color} !important;
-  --dark-background-light-text-add-on-selection-color: ${default_selection_color} !important;
 }
 
 html {
 ${
   is_toplevel
     ? `\
-  background-color: ${default_background_color};
+  background-color: transparent;
 `
     : ''
 }\
   color: ${default_foreground_color};
-}
-
-*:link,
-*:link * {
-  color: ${default_link_color} !important;
-}
-
-*:visited,
-*:visited * {
-  color: ${default_visited_color} !important;
 }
 
 input[type="range"] {
@@ -53,11 +34,9 @@ select,
 [contenteditable="true"] {
   -moz-appearance: none !important;
   color: ${default_foreground_color} !important;
-  background-color: ${default_background_color};
-  border-radius: 4px;
-  border-width: 1px;
-  border-color: ${default_foreground_color};
-  border-style: solid;
+  background-color: transparent;
+  border: none !important;
+  outline: none !important;
   transition-duration: 0.3s;
   transition-property: border-color, box-shadow;
 }
@@ -66,34 +45,6 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="
 textarea,
 [contenteditable="true"] {
   background-image: none !important;
-}
-
-input:focus:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="button"]):not([type="color"]):not([type="image"]):not([type="reset"]):not([type="submit"]),
-textarea:focus,
-[contenteditable="true"]:focus {
-  box-shadow: inset 0 0 0.15em 0.15em ${default_selection_color} !important;
-  border-color: ${default_selection_color} !important;
-}
-
-button,
-input[type="button"],
-input[type="color"],
-input[type="image"],
-input[type="reset"],
-input[type="submit"],
-select {
-  box-shadow: 0 0 0.15em 0.15em transparent !important;
-}
-
-button:focus,
-input[type="button"]:focus,
-input[type="color"]:focus,
-input[type="image"]:focus,
-input[type="reset"]:focus,
-input[type="submit"]:focus,
-select:focus {
-  box-shadow: 0 0 0.15em 0.15em ${default_selection_color} !important;
-  border-color: ${default_selection_color} !important;
 }
 
 select {
@@ -106,72 +57,157 @@ select {
   background-size: 1em !important;
 }
 
-*::-moz-selection {
-  color: ${default_foreground_color} !important;
-  background: ${default_selection_color} !important;
-  text-shadow:
-    ${default_background_color} 0 0 1pt,
-    ${default_background_color} 0 0 2pt,
-    ${default_background_color} 0 0 3pt,
-    ${default_background_color} 0 0 4pt,
-    ${default_background_color} 0 0 5pt,
-    ${default_background_color} 0 0 5pt,
-    ${default_background_color} 0 0 5pt !important;
+/* Gmail Sidebar Navigation Icons */
+.TK .nZ,
+.TK .TO .nZ,
+.CL .nZ,
+.CL .TO .nZ,
+.aim .aio,
+.ain .a8X,
+.z0 .L3[data-tooltip*="Compose"],
+.gb_pc[aria-label*="Gmail"],
+.gb_f[aria-label*="Gmail"],
+.aKS[role="tab"],
+.aKU[role="tab"],
+.aqJ[role="tab"],
+.aql[role="tab"],
+.aqm[role="tab"],
+.TK .aHS-bnt,
+.TK .n6,
+.TK .CJ,
+.TK .CL,
+.TK .qj,
+.TK .TO .aHS-bnt,
+.TK .TO .n6,
+.TK .TO .CJ,
+.TK .TO .qj,
+.TK .n6 .aT6,
+.TK .n6 svg,
+.TK .CJ svg,
+.TK .qj svg,
+.TK [data-tooltip] svg,
+.z0 .L3,
+.z0 .aic,
+.btC .gU,
+.TK .aHS-bu1,
+.TK .aT6,
+.TK .CK,
+.TK a:not([aria-selected="true"]) .qj,
+.TK a:not([aria-selected="true"]) .CJ,
+.TK a:not([aria-selected="true"]) svg,
+.TK li:not([aria-selected="true"]) .qj,
+.TK li:not([aria-selected="true"]) .CJ,
+.TK li:not([aria-selected="true"]) svg,
+.TK .n3,
+.TK .n4,
+.TK .WR .n3,
+.TK .WR .n4,
+/* Gmail Sidebar Navigation Links */
+.TK a[href*="#inbox"],
+.TK a[href*="#starred"],
+.TK a[href*="#snoozed"],
+.TK a[href*="#sent"],
+.TK a[href*="#drafts"],
+.CL a[href*="#compose"],
+/* Gmail Toolbar Icons */
+.ar .T-I,
+.ar .T-I-J3,
+.ar .T-I-Kq,
+.ar .T-I-Js-IF,
+.ar .T-I-ax7,
+.ar [data-tooltip],
+.ar button,
+.ar [role="button"],
+.G-Ni .T-I,
+.G-Ni button,
+.G-Ni [role="button"],
+.G-Ni [data-tooltip],
+.aeN .T-I,
+.aeN button,
+.aeN [role="button"],
+.aeN [data-tooltip],
+.ar svg,
+.G-Ni svg,
+.aeN svg,
+.nH .ar svg,
+.nH .G-Ni svg,
+.nH .aeN svg,
+/* Navigation SVG Icons */
+nav[role="navigation"] svg:not([data-exclude-icon]),
+.TK nav svg:not([data-exclude-icon]),
+.G-Ni svg:not([data-exclude-icon]),
+.aeN svg:not([data-exclude-icon]),
+/* Named SVG Icons */
+svg[data-icon-name="inbox"],
+svg[data-icon-name="star"],
+svg[data-icon-name="schedule"],
+svg[data-icon-name="send"],
+svg[data-icon-name="draft"],
+svg[data-icon-name="label"],
+/* Tooltip-based Icon Targeting */
+[data-tooltip*="Archive"] svg,
+[data-tooltip*="Delete"] svg,
+[data-tooltip*="Mark"] svg,
+[data-tooltip*="Snooze"] svg,
+[data-tooltip*="More"] svg,
+[aria-label*="Archive"] svg,
+[aria-label*="Delete"] svg,
+[aria-label*="Mark"] svg,
+[aria-label*="Snooze"] svg,
+[aria-label*="More"] svg {
+  filter: brightness(0) invert(1) !important;
 }
 
-${'' /* TODO: "black on transparent" mark */}\
-${
-  is_darkbg
-    ? `\
-img[alt="inline_formula"],
-.mwe-math-fallback-image-inline,
-${
-  '' /* charts, for example on https://addons.mozilla.org/en-US/firefox/addon/black-background-white-text/statistics/ */
-}\
-.highcharts-container {
-  filter: invert(1) hue-rotate(180deg) !important;
-}
-`
-    : ''
-}\
-\
-${'' /* https://catalog.onliner.by/ */}\
-${
-  is_darkbg
-    ? `\
-.catalog-content .i-checkbox__faux::before {
-  filter: invert(1);
-}
-`
-    : ''
-}\
-\
-${'' /* #8 google scholar bars on right sidebar */}\
-#gs_bdy .gsc_g_a[style*="height"] {
-  background-color: rgb(119 119 119) !important;
+/* Gmail Sidebar Images */
+.TK .nZ img,
+.TK .TO img,
+.TK .CJ img,
+.TK .qj img,
+.aim img,
+.ain img,
+.z0 img {
+  filter: brightness(0) invert(1) !important;
 }
 
-${
-  '' /* https://github.com/qooob/authentic-theme radio buttons. unfortunately, there is no public available demo */
-}\
-.awradio label::after {
-  background-color: ${default_foreground_color} !important;
+/* Gmail Navigation Elements */
+.TK .n6 *:not(img) {
+  filter: brightness(0) invert(1) !important;
 }
-\
-${'' /* buttons on many google services (Books, Translate, etc) */}\
-${
-  is_darkbg
-    ? `\
-.jfk-button-img {
-  filter: invert(1);
-}
-`
-    : ''
-}\
 
-${'' /* Google Docs cursor (#220) */}\
-#kix-current-user-cursor-caret[style*="border-color: rgb(0 0 0)"] {
-  border-color: ${default_foreground_color} !important;
+/* Content Images - Exclude from Icon Filtering */
+img,
+[role="img"],
+.aXq img,
+.go img,
+.yW img,
+.aZo img,
+[data-hovercard-id] img,
+.bzc img,
+[aria-label*="Profile"] img,
+[aria-label*="profile"] img,
+[title*="Profile"] img,
+[title*="profile"] img,
+.aKw img {
+  filter: none !important;
+}
+
+/* Transparent Backgrounds */
+
+.nH,
+.aT,
+.ar,
+.as,
+.G-Ni,
+.aeN,
+.TO,
+.Di,
+.J-Ke,
+.aim,
+.ain,
+.CL,
+.TK {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 `;
 }

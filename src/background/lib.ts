@@ -4,16 +4,16 @@ export function modify_csp(
   header: WebRequest.HttpHeadersItemType,
 ): WebRequest.HttpHeadersItemType {
   if (header.name.toLowerCase() === 'content-security-policy') {
-    const new_values = header.value!.split(',').map((value) => {
+    const new_values = header.value!.split(',').map(value => {
       const directives: { [key: string]: string[] } = {};
       for (const directive of value
         .split(';')
-        .map((d) => d.trim())
-        .filter((d) => d.length > 0)) {
+        .map(d => d.trim())
+        .filter(d => d.length > 0)) {
         const parts = directive
           .split(' ')
-          .map((p) => p.trim())
-          .filter((p) => p.length > 0);
+          .map(p => p.trim())
+          .filter(p => p.length > 0);
         const name = parts.shift()!;
         directives[name] = parts;
       }
@@ -48,7 +48,7 @@ export function modify_csp(
       }
 
       return Object.keys(directives)
-        .map((k) => `${k} ${directives[k].join(' ')}`)
+        .map(k => `${k} ${directives[k].join(' ')}`)
         .join('; ');
     });
     return {
@@ -85,7 +85,7 @@ export function modify_cors(
 }
 
 function splitver(ver: string): number[] {
-  return ver.split('.').map((s) => parseInt(s, 10));
+  return ver.split('.').map(s => parseInt(s, 10));
 }
 
 /** Very simple "less than" for version strings

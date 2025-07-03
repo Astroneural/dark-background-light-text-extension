@@ -5,7 +5,7 @@ export function smart_generate_urls(
   url_str: string,
   hint: boolean = false,
 ): string[] {
-  return generate_urls(url_str, hint, (hostname) => {
+  return generate_urls(url_str, hint, hostname => {
     const tldts_obj = tldts_parse(hostname, {
       detectIp: false,
       extractHostname: false,

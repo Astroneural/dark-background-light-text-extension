@@ -1,10 +1,16 @@
 {
   "manifest_version": 2,
-  "name": "Dark Background and Light Text",
-  "version": "0.7.6",
-  "description": "Makes every page to have light text on dark background (exact colors are customizable)",
+  "name": "Transparent Backgrounds & Readable Text",
+  "version": "1.0.0",
+  "description": "Creates clean, readable web pages by making backgrounds transparent while preserving text visibility and UI icons",
+  "author": "Extension Developer",
+  "homepage_url": "https://github.com/your-username/transparent-backgrounds-extension",
   "icons": {
-    "48": "icons/icon48.png"
+    "16": "icons/icon16.png",
+    "24": "icons/icon24.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "64": "icons/icon64.png"
   },
   "applications": {
     "gecko": {
@@ -46,7 +52,7 @@
       "48": "icons/icon48.png",
       "64": "icons/icon64.png"
     },
-    "default_title": "Dark Background and Light Text",
+    "default_title": "Transparent Backgrounds & Readable Text",
     "default_popup": "ui/configure-for-current-tab-panel.html"
   },
   "options_ui": {

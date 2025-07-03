@@ -46,9 +46,9 @@ async function get_method_for_url(
 ): Promise<MethodMetadataWithExecutors> {
   if (window.prefs.enabled) {
     if (is_iframe) {
-      const parent_method_number = await browser.runtime.sendMessage({
+      const parent_method_number = (await browser.runtime.sendMessage({
         action: 'query_parent_method_number',
-      });
+      })) as MethodIndex;
       if (methods[parent_method_number].affects_iframes) {
         return methods[0];
       } else if (url === 'about:blank' || url === 'about:srcdoc') {
@@ -58,7 +58,7 @@ async function get_method_for_url(
     // TODO: get rid of await here, https://bugzilla.mozilla.org/show_bug.cgi?id=1574713
     let tab_configuration: MethodIndex | boolean = false;
     if (Object.keys(window.configured_tabs).length > 0) {
-      const tabId = await tabId_promise;
+      const tabId = (await tabId_promise) as number;
       tab_configuration = Object.prototype.hasOwnProperty.call(
         window.configured_tabs,
         tabId,
@@ -67,7 +67,7 @@ async function get_method_for_url(
         : false;
     }
     if (tab_configuration !== false) {
-      return methods[tab_configuration];
+      return methods[tab_configuration as MethodIndex];
     }
 
     const configured_urls = Object.keys(window.merged_configured);
@@ -106,7 +106,7 @@ window.do_it = async function do_it(changes: {
     if (
       !current_method
       || new_method.number !== current_method.number
-      || Object.keys(changes).some((key) => key.indexOf('_color') >= 0) // TODO: better condition
+      || Object.keys(changes).some(key => key.indexOf('_color') >= 0) // TODO: better condition
     ) {
       for (const node of document.querySelectorAll(
         'style[class="dblt-ykjmwcnxmi"]',
@@ -146,30 +146,25 @@ window.do_it = async function do_it(changes: {
   }
 };
 
-interface GetMethodNumberMsg {
-  action: 'get_method_number';
-}
-browser.runtime.onMessage.addListener(
-  async (message: GetMethodNumberMsg, _sender) => {
-    try {
-      // TODO: statically typed runtime.onMessage
-      if (!message.action) {
-        console.error('bad message!', message);
-        return;
-      }
-      switch (message.action) {
-        case 'get_method_number':
-          return (await current_method_promise).number;
-        default:
-          console.error('bad message 2!', message);
-          return;
-      }
-    } catch (e) {
-      console.error(e);
+browser.runtime.onMessage.addListener(async (message: any, _sender: any) => {
+  try {
+    // TODO: statically typed runtime.onMessage
+    if (!message.action) {
+      console.error('bad message!', message);
+      return;
     }
-    return;
-  },
-);
+    switch (message.action) {
+      case 'get_method_number':
+        return (await current_method_promise).number;
+      default:
+        console.error('bad message 2!', message);
+        return;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  return;
+});
 
 if (window.content_script_state === 'registered_content_script_first') {
   /* #226 part 1 workaround */

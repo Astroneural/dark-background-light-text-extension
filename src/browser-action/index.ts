@@ -48,7 +48,7 @@ declare const browser: Browser;
         }
       }
     }
-    result_list = result_list.filter((url) => url !== hint_marker).reverse();
+    result_list = result_list.filter(url => url !== hint_marker).reverse();
 
     return { list: result_list, preselect };
   }
@@ -284,4 +284,4 @@ declare const browser: Browser;
   preferences.appendChild(prefs_button);
 
   body.appendChild(preferences);
-})().catch((rejection) => console.error(rejection));
+})().catch(rejection => console.error(rejection));

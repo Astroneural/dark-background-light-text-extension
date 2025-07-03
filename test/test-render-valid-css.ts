@@ -1,6 +1,7 @@
 import { strict as assert } from 'assert';
 import { describe } from 'mocha';
-import { lint, LintResult } from 'stylelint';
+import { lint } from 'stylelint';
+import type { LintResult } from 'stylelint';
 import type { RenderOptions } from '../src/common/types';
 import { methods } from '../src/methods/methods-with-stylesheets';
 
@@ -45,25 +46,16 @@ describe('Test if valid CSS are rendered', () => {
     const options: RenderOptions = {
       default_foreground_color: '#123456',
       default_background_color: '#123456',
-      default_link_color: '#123456',
-      default_visited_color: '#123456',
-      default_active_color: '#123456',
-      default_selection_color: '#123456',
       is_toplevel: true,
-      is_darkbg: true,
     };
-    for (const [is_toplevel, is_darkbg] of [
-      [true, true],
-      [false, false],
-      [true, false],
-      [false, true],
+    for (const [is_toplevel] of [
+      [true],
+      [false],
     ]) {
       options.is_toplevel = is_toplevel;
-      options.is_darkbg = is_darkbg;
       const options_copy = { ...options };
       it(`${renderer.name} ${JSON.stringify({
         is_toplevel,
-        is_darkbg,
       })}`, async () => {
         const rendered = renderer.render(options_copy);
         const result_object = await lint({

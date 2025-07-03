@@ -1,4 +1,3 @@
-import { parseCSSColor } from 'csscolorparser-ts';
 import type {
   Runtime,
   ContentScripts,
@@ -9,21 +8,20 @@ import type {
   Tabs,
   Browser,
 } from 'webextension-polyfill';
-import {
+import type {
   ConfiguredPages,
   ConfiguredTabs,
   StylesheetRenderer,
-  CallbackID,
 } from '../common/types';
+import { CallbackID } from '../common/types';
 import {
   get_prefs,
   set_pref,
   on_prefs_change,
   get_merged_configured_common,
-  PrefsWithValues,
 } from '../common/shared';
+import type { PrefsWithValues } from '../common/shared';
 import { methods } from '../methods/methods-with-stylesheets';
-import { relative_luminance, strip_alpha } from '../common/color_utils';
 import { modify_cors, modify_csp, version_lt } from './lib';
 import * as base_style from '../methods/stylesheets/base';
 
@@ -41,7 +39,7 @@ function get_merged_configured(): Promise<ConfiguredPages> {
     Promise.resolve(configured_private),
   );
 }
-browser.tabs.onRemoved.addListener(async (tabId) => {
+browser.tabs.onRemoved.addListener(async tabId => {
   try {
     if (Object.keys(configured_private).length > 0) {
       for (const tab of await browser.tabs.query({})) {
@@ -69,123 +67,117 @@ function process_stylesheet(
   // however, this enables them to cache the value
   prefs: PrefsWithValues,
 ) {
-  const is_darkbg =
-    relative_luminance(
-      strip_alpha(parseCSSColor(prefs.default_background_color as string)!),
-    )
-    < relative_luminance(
-      strip_alpha(parseCSSColor(prefs.default_foreground_color as string)!),
-    );
   return sheet.render({
     default_foreground_color: prefs.default_foreground_color as string,
     default_background_color: prefs.default_background_color as string,
-    default_link_color: prefs.default_link_color as string,
-    default_visited_color: prefs.default_visited_color as string,
-    default_active_color: prefs.default_active_color as string,
-    default_selection_color: prefs.default_selection_color as string,
     is_toplevel,
-    is_darkbg,
   });
 }
 
-browser.runtime.onMessage.addListener(async (message, sender) => {
-  try {
-    // TODO: statically typed runtime.onMessage
-    if (!Object.prototype.hasOwnProperty.call(message, 'action')) {
-      console.error('bad message!', message);
+browser.runtime.onMessage.addListener(
+  async (message: any, sender: Runtime.MessageSender) => {
+    try {
+      // TODO: statically typed runtime.onMessage
+      if (!Object.prototype.hasOwnProperty.call(message, 'action')) {
+        console.error('bad message!', message);
+        return;
+      }
+      switch (message.action) {
+        case 'query_tabId':
+          return sender.tab?.id;
+        case CallbackID.INSERT_CSS:
+          return await browser.tabs.insertCSS(sender.tab?.id, {
+            code: message.code,
+            frameId: sender.frameId,
+            cssOrigin: 'user',
+            runAt: 'document_start',
+          });
+        case CallbackID.REMOVE_CSS:
+          return await browser.tabs.removeCSS(sender.tab?.id, {
+            code: message.code,
+            frameId: sender.frameId,
+            cssOrigin: 'user',
+            runAt: 'document_start',
+          });
+        case 'query_base_style':
+          return process_stylesheet(base_style, true, await get_prefs());
+        case 'get_configured_private':
+          return configured_private;
+        case 'set_configured_private':
+          if (message.value === null) {
+            delete configured_private[message.key];
+          } else {
+            configured_private[message.key] = message.value;
+          }
+          send_prefs({});
+          return;
+        // @ts-ignore: 7029
+        case 'get_my_tab_configuration':
+          message.tab_id = sender.tab?.id; // eslint-disable-line no-param-reassign
+        // falls through
+        case 'get_tab_configuration':
+          if (
+            Object.prototype.hasOwnProperty.call(
+              configured_tabs,
+              message.tab_id,
+            )
+          ) {
+            return configured_tabs[message.tab_id];
+          }
+          return false;
+        case 'set_configured_tab':
+          if (message.value === null) {
+            if (
+              Object.prototype.hasOwnProperty.call(configured_tabs, message.key)
+            ) {
+              delete configured_tabs[message.key];
+            }
+          } else {
+            configured_tabs[message.key] = message.value;
+          }
+          send_prefs({});
+          return;
+        case 'open_options_page':
+          // while runtime.openOptionsPage() works from browserAction page script,
+          // due to bug 1414917 it behaves unintuitive on Fennec so here is a workaround
+          if ((await platform_info).os === 'android') {
+            setTimeout(() => browser.runtime.openOptionsPage(), 500);
+          } else {
+            browser.runtime.openOptionsPage();
+          }
+          return;
+        case 'is_commands_update_available':
+          return (
+            Object.prototype.hasOwnProperty.call(browser, 'commands')
+            && Object.prototype.hasOwnProperty.call(browser.commands, 'update')
+          );
+        case 'query_parent_method_number':
+          if (sender.frameId === 0) {
+            console.error(
+              'Top-level frame requested some info about its parent. That should not happen. The sender is:',
+              sender,
+            );
+            return await get_prefs('default_method');
+          }
+          return await browser.tabs.sendMessage(
+            sender.tab!.id!,
+            { action: 'get_method_number' },
+            { frameId: 0 },
+          );
+        default:
+          console.error('bad message 2!', message);
+          return;
+      }
+    } catch (e) {
+      console.error(e);
       return;
     }
-    switch (message.action) {
-      case 'query_tabId':
-        return sender.tab?.id;
-      case CallbackID.INSERT_CSS:
-        return await browser.tabs.insertCSS(sender.tab?.id, {
-          code: message.code,
-          frameId: sender.frameId,
-          cssOrigin: 'user',
-          runAt: 'document_start',
-        });
-      case CallbackID.REMOVE_CSS:
-        return await browser.tabs.removeCSS(sender.tab?.id, {
-          code: message.code,
-          frameId: sender.frameId,
-          cssOrigin: 'user',
-          runAt: 'document_start',
-        });
-      case 'query_base_style':
-        return process_stylesheet(base_style, true, await get_prefs());
-      case 'get_configured_private':
-        return configured_private;
-      case 'set_configured_private':
-        if (message.value === null) {
-          delete configured_private[message.key];
-        } else {
-          configured_private[message.key] = message.value;
-        }
-        send_prefs({});
-        break;
-      // @ts-ignore: 7029
-      case 'get_my_tab_configuration':
-        message.tab_id = sender.tab?.id; // eslint-disable-line no-param-reassign
-      // falls through
-      case 'get_tab_configuration':
-        if (
-          Object.prototype.hasOwnProperty.call(configured_tabs, message.tab_id)
-        ) {
-          return configured_tabs[message.tab_id];
-        }
-        return false;
-      case 'set_configured_tab':
-        if (message.value === null) {
-          if (
-            Object.prototype.hasOwnProperty.call(configured_tabs, message.key)
-          ) {
-            delete configured_tabs[message.key];
-          }
-        } else {
-          configured_tabs[message.key] = message.value;
-        }
-        send_prefs({});
-        break;
-      case 'open_options_page':
-        // while runtime.openOptionsPage() works from browserAction page script,
-        // due to bug 1414917 it behaves unintuitive on Fennec so here is a workaround
-        if ((await platform_info).os === 'android') {
-          setTimeout(() => browser.runtime.openOptionsPage(), 500);
-        } else {
-          browser.runtime.openOptionsPage();
-        }
-        break;
-      case 'is_commands_update_available':
-        return (
-          Object.prototype.hasOwnProperty.call(browser, 'commands')
-          && Object.prototype.hasOwnProperty.call(browser.commands, 'update')
-        );
-      case 'query_parent_method_number':
-        if (sender.frameId === 0) {
-          console.error(
-            'Top-level frame requested some info about its parent. That should not happen. The sender is:',
-            sender,
-          );
-          return await get_prefs('default_method');
-        }
-        return await browser.tabs.sendMessage(
-          sender.tab!.id!,
-          { action: 'get_method_number' },
-          { frameId: 0 },
-        );
-      default:
-        console.error('bad message 2!', message);
-        break;
-    }
-  } catch (e) {
-    console.error(e);
-  }
-});
+  },
+);
 
 const prev_scripts: ContentScripts.RegisteredContentScript[] = [];
 async function send_prefs(changes: { [s: string]: Storage.StorageChange }) {
-  prev_scripts.forEach((cs) => cs.unregister());
+  prev_scripts.forEach(cs => cs.unregister());
   prev_scripts.length = 0;
   const from_manifest = (
     browser.runtime.getManifest() as Manifest.WebExtensionManifest
@@ -197,7 +189,7 @@ async function send_prefs(changes: { [s: string]: Storage.StorageChange }) {
   const prefs = await get_prefs();
   for (const css_renderer of new Set(
     Object.values(methods)
-      .map((m) => m.stylesheets)
+      .map(m => m.stylesheets)
       .flat(),
   )) {
     rendered_stylesheets[`${css_renderer.name}_iframe`] = process_stylesheet(
@@ -257,7 +249,7 @@ send_prefs({});
 on_prefs_change(send_prefs);
 
 if (Object.prototype.hasOwnProperty.call(browser, 'commands')) {
-  browser.commands.onCommand.addListener(async (name) => {
+  browser.commands.onCommand.addListener(async name => {
     try {
       let current_tab: Tabs.Tab;
       switch (name) {
@@ -291,17 +283,17 @@ if (Object.prototype.hasOwnProperty.call(browser, 'commands')) {
   });
 }
 
-get_prefs('do_not_set_overrideDocumentColors_to_never').then((val) => {
+get_prefs('do_not_set_overrideDocumentColors_to_never').then(val => {
   if (!val) {
     // The extension can barely do anything when overrideDocumentColors == always
     // or overrideDocumentColors == high-contrast-only is set and high contrast mode is in use
     browser.browserSettings.overrideDocumentColors
       .set({ value: 'never' })
-      .catch((error) => console.error(error));
+      .catch(error => console.error(error));
   }
 });
 
-browser.runtime.onInstalled.addListener((details) => {
+browser.runtime.onInstalled.addListener(details => {
   if (
     details.reason === 'install'
     || (details.reason === 'update'
@@ -313,7 +305,7 @@ browser.runtime.onInstalled.addListener((details) => {
 });
 
 browser.webRequest.onHeadersReceived.addListener(
-  (details) => {
+  details => {
     try {
       return {
         responseHeaders: details.responseHeaders!.map(modify_csp),
@@ -354,11 +346,11 @@ function is_probably_service_worker(
 function get_content_type(
   headers?: WebRequest.HttpHeaders,
 ): string | undefined {
-  return headers?.find((h) => h.name.toLowerCase() === 'content-type')?.value;
+  return headers?.find(h => h.name.toLowerCase() === 'content-type')?.value;
 }
 
 browser.webRequest.onHeadersReceived.addListener(
-  (details) => {
+  details => {
     if (
       details.type === 'stylesheet'
       || (is_probably_service_worker(details)

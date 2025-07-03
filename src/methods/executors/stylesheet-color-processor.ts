@@ -36,7 +36,7 @@ function parse_text_shadow(
 }
 
 const intersect = (set1: string[], set2: string[]): boolean =>
-  set1.some((set1_cur) =>
+  set1.some(set1_cur =>
     set2.some(
       (
         set2_cur, // TODO: remove redundant .toLowerCase()
@@ -57,6 +57,16 @@ const preserve_background_color: string[] = [
   '.ytp-progress-list',
   '.paper-toggle-button',
   '.barchart', // sentry charts
+  // Gmail sidebar icons and navigation
+  '.TK .nZ',
+  '.aim .aio',
+  '.ain .a8X',
+  '.CL .nZ',
+  '.TO .nZ',
+  'div[data-tooltip]',
+  '.aAv',
+  '.am',
+  '.n0',
 ];
 
 const remove_background_image: string[] = [
@@ -105,6 +115,23 @@ const do_not_remove_background_image: string[] = [
   'tooltip', // ytp-tooltip-bg class
   'avatar',
   'browserref', // https://www.w3schools.com/
+  // Gmail icons and interface elements
+  'gmail',
+  'inbox',
+  'starred',
+  'sent',
+  'drafts',
+  'more',
+  'compose',
+  '.TK',
+  '.aim',
+  '.ain',
+  '.CL',
+  '.TO',
+  '.aAv',
+  '.am',
+  '.n0',
+  'mail.google.com',
 ];
 
 const system_colors: string[] = [
@@ -145,7 +172,7 @@ const system_colors: string[] = [
   'Window',
   'WindowFrame',
   'WindowText',
-].map((c) => c.toLowerCase());
+].map(c => c.toLowerCase());
 
 export class StylesheetColorProcessor
   extends StylesheetProcessorAbstract
@@ -182,9 +209,9 @@ export class StylesheetColorProcessor
           default_light_color: default_background_color,
           default_dark_color: default_foreground_color,
         };
-    this.backgroundify_color = (color_array) =>
+    this.backgroundify_color = color_array =>
       lighten_or_darken_color(color_array, is_dark_background, default_colors);
-    this.foregroundify_color = (color_array) =>
+    this.foregroundify_color = color_array =>
       lighten_or_darken_color(color_array, !is_dark_background, default_colors);
   }
 
@@ -248,11 +275,6 @@ export class StylesheetColorProcessor
       CSSStyleDeclaration_v.getPropertyValue('background-color');
     const background_image =
       CSSStyleDeclaration_v.getPropertyValue('background-image');
-    const background_repeat =
-      CSSStyleDeclaration_v.getPropertyValue('background-repeat');
-    const background_position = CSSStyleDeclaration_v.getPropertyValue(
-      'background-position',
-    );
     const text_shadow = CSSStyleDeclaration_v.getPropertyValue('text-shadow');
 
     let add_safe_text_shadow = false;
@@ -266,7 +288,7 @@ export class StylesheetColorProcessor
 
     if (
       background.indexOf('var(') >= 0
-      && !preserve_background_color.some((val) => selector.indexOf(val) >= 0)
+      && !preserve_background_color.some(val => selector.indexOf(val) >= 0)
     ) {
       CSSStyleDeclaration_v.setProperty(
         'background',
@@ -276,7 +298,7 @@ export class StylesheetColorProcessor
     }
     if (
       background_color
-      && !preserve_background_color.some((val) => selector.indexOf(val) >= 0)
+      && !preserve_background_color.some(val => selector.indexOf(val) >= 0)
     ) {
       CSSStyleDeclaration_v.setProperty(
         'background-color',
@@ -285,45 +307,28 @@ export class StylesheetColorProcessor
       );
     }
     if (background_image) {
-      const bg_images = brackets_aware_split(background_image, undefined);
-      let bg_repeats: string[];
-      let bg_positions: string[];
-
-      // TODO: combine next two splits:
-      if (background_repeat) {
-        bg_repeats = background_repeat.split(',').map((bgRep) => bgRep.trim());
+      // Check if this is a Gmail icon that should be preserved
+      if (
+        preserve_background_color.some(val => selector.indexOf(val) >= 0)
+        || intersect(do_not_remove_background_image, [
+          background_image,
+          selector,
+        ])
+      ) {
+        // Keep the background image for preserved elements
+        // Don't modify it
       } else {
-        bg_repeats = ['repeat'];
+        // Make all other background images transparent
+        CSSStyleDeclaration_v.setProperty(
+          'background-image',
+          'none',
+          CSSStyleDeclaration_v.getPropertyPriority('background-image'),
+        );
       }
-      if (background_position) {
-        bg_positions = background_position
-          .split(',')
-          .map((bgPos) => bgPos.trim());
-      } else {
-        bg_positions = ['0% 0%'];
-      }
-      const new_bg_images = bg_images.map((currentValue, index) => {
-        const [new_bg_image, add_safe_text_shadow_c] =
-          this.process_background_image(
-            currentValue,
-            // complex index to cycle through bg_repeats
-            bg_repeats[index % bg_repeats.length],
-            bg_positions[index % bg_positions.length],
-            selector,
-            base_url,
-          );
-        add_safe_text_shadow = add_safe_text_shadow || add_safe_text_shadow_c;
-        return new_bg_image;
-      });
-      CSSStyleDeclaration_v.setProperty(
-        'background-image',
-        new_bg_images.join(', '),
-        CSSStyleDeclaration_v.getPropertyPriority('background-image'),
-      );
     }
     if (!add_safe_text_shadow && text_shadow) {
       const parts = brackets_aware_split(text_shadow, undefined).map(
-        (text_shadow_splitted) => {
+        text_shadow_splitted => {
           const [parsed, color_index] = parse_text_shadow(text_shadow_splitted);
           if (parsed !== null && color_index !== null) {
             parsed[color_index] = this.backgroundify_color(
@@ -410,21 +415,15 @@ export class StylesheetColorProcessor
       return StylesheetColorProcessor.process_css_var_usage(
         bg_part,
         this.rename_var_bg,
-        (s) => this.process_bg_part(s, selector, base_url),
+        s => this.process_bg_part(s, selector, base_url),
       );
     }
     const probably_color = this.process_color_property(bg_part, false, true);
     if (probably_color) {
       return probably_color;
     }
-    // TODO: safe text shadow?                      TODO: bg_repeat, bg_position
-    return this.process_background_image(
-      bg_part,
-      'TODO bg_repeat',
-      'TODO bg_position',
-      selector,
-      base_url,
-    )[0];
+    // For non-color background properties, return transparent to simplify
+    return 'transparent';
   }
 
   process_background_property(
@@ -466,19 +465,19 @@ export class StylesheetColorProcessor
     if (rgb_color_array) {
       return is_foreground
         ? this.foregroundify_color(rgb_color_array)
-        : this.backgroundify_color(rgb_color_array);
+        : 'transparent';
     } else if (
       color.indexOf('-moz-') >= 0
       || system_colors.indexOf(color.toLowerCase()) >= 0
     ) {
       return is_foreground
         ? this.options.default_foreground_color
-        : this.options.default_background_color;
+        : 'transparent';
     } else if (StylesheetColorProcessor.is_css_var(color)) {
       return StylesheetColorProcessor.process_css_var_usage(
         color,
         is_foreground ? this.rename_var_fg : this.rename_var_bg,
-        (s) => this.process_color_property(s, is_foreground, false),
+        s => this.process_color_property(s, is_foreground, false),
       );
     }
     if (!no_ret_if_fail) {
@@ -486,7 +485,7 @@ export class StylesheetColorProcessor
         // instagram weird variable use crutches
         return is_foreground
           ? this.options.default_foreground_color
-          : this.options.default_background_color;
+          : 'transparent';
       } else {
         return color;
       }
@@ -544,9 +543,9 @@ export class StylesheetColorProcessor
       const gradient_function = bg_image.slice(0, open_bracket_i);
       const params_str = bg_image.slice(open_bracket_i + 1, close_bracket_i);
       const params_arr = brackets_aware_split(params_str, undefined);
-      const result_arr = params_arr.map((param) =>
+      const result_arr = params_arr.map(param =>
         brackets_aware_split(param, ' ')
-          .map((s) => this.process_color_property(s, false, false))
+          .map(s => this.process_color_property(s, false, false))
           .join(' '),
       );
       return [`${gradient_function}(${result_arr.join(', ')})`, false];

@@ -11,7 +11,7 @@ export function render({
 }
 
 *:not(.colorpickertile):not(.colorpicker-button-colorbox) {
-  background-color: ${default_background_color} !important;
+  background-color: transparent !important;
 }
 
 a *,

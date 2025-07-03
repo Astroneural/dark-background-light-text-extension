@@ -25,8 +25,8 @@ export const preferences: Preferences = [
     value: 1,
     type: 'menulist',
     options: Object.keys(methods)
-      .filter((key) => parseInt(key, 10) >= 0)
-      .map((key) => ({
+      .filter(key => parseInt(key, 10) >= 0)
+      .map(key => ({
         label: methods[key].label,
         value: key,
       })),
@@ -43,30 +43,6 @@ export const preferences: Preferences = [
     name: 'default_background_color',
     value: '#000000',
     title: 'Default background color',
-  } as ColorPreference,
-  {
-    type: 'color',
-    name: 'default_link_color',
-    value: '#7fd7ff',
-    title: 'Default link color',
-  } as ColorPreference,
-  {
-    type: 'color',
-    name: 'default_visited_color',
-    value: '#ffafff',
-    title: 'Default visited link color',
-  } as ColorPreference,
-  {
-    type: 'color',
-    name: 'default_active_color',
-    value: '#ff0000',
-    title: 'Default active link color',
-  } as ColorPreference,
-  {
-    type: 'color',
-    name: 'default_selection_color',
-    value: '#8080ff',
-    title: 'Default selection color',
   } as ColorPreference,
   {
     type: 'bool',
@@ -87,7 +63,7 @@ export interface PrefsWithValues {
 }
 export const prefs_keys_with_defaults = ((): PrefsWithValues => {
   const result: PrefsWithValues = {};
-  preferences.forEach((pref) => {
+  preferences.forEach(pref => {
     result[pref.name] = pref.value;
   });
   return result;
@@ -120,7 +96,11 @@ export async function get_prefs(
     throw new Error('get_prefs parameter has unsupported type');
   }
   const ret_data = await browser.storage.local.get(query);
-  return is_single ? ret_data[prefs as string] : ret_data;
+  if (is_single) {
+    return ret_data[prefs as string] as PrefsType;
+  } else {
+    return ret_data as PrefsWithValues;
+  }
 }
 
 export function set_pref(pref: string, value: PrefsType): Promise<void> {
@@ -153,8 +133,11 @@ export async function get_merged_configured_common(
   get_configured_private: () => Promise<ConfiguredPages>,
 ): Promise<ConfiguredPages> {
   const local_storage_p = browser.storage.local.get({ configured_pages: {} });
+  const local_storage_data = await local_storage_p;
+  const configured_pages =
+    local_storage_data.configured_pages as ConfiguredPages;
   return {
-    ...(await local_storage_p).configured_pages,
+    ...configured_pages,
     ...(await get_configured_private()),
     // ...built_in_configured,
   };
