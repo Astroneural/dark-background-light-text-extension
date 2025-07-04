@@ -132,29 +132,33 @@ select {
 .nH .ar svg,
 .nH .G-Ni svg,
 .nH .aeN svg,
-/* Navigation SVG Icons */
-nav[role="navigation"] svg:not([data-exclude-icon]),
+/* Gmail-specific Navigation SVG Icons */
 .TK nav svg:not([data-exclude-icon]),
 .G-Ni svg:not([data-exclude-icon]),
 .aeN svg:not([data-exclude-icon]),
-/* Named SVG Icons */
-svg[data-icon-name="inbox"],
-svg[data-icon-name="star"],
-svg[data-icon-name="schedule"],
-svg[data-icon-name="send"],
-svg[data-icon-name="draft"],
-svg[data-icon-name="label"],
-/* Tooltip-based Icon Targeting */
-[data-tooltip*="Archive"] svg,
-[data-tooltip*="Delete"] svg,
-[data-tooltip*="Mark"] svg,
-[data-tooltip*="Snooze"] svg,
-[data-tooltip*="More"] svg,
-[aria-label*="Archive"] svg,
-[aria-label*="Delete"] svg,
-[aria-label*="Mark"] svg,
-[aria-label*="Snooze"] svg,
-[aria-label*="More"] svg {
+/* Gmail Named SVG Icons */
+.nH svg[data-icon-name="inbox"],
+.nH svg[data-icon-name="star"],
+.nH svg[data-icon-name="schedule"],
+.nH svg[data-icon-name="send"],
+.nH svg[data-icon-name="draft"],
+.nH svg[data-icon-name="label"],
+/* Gmail Tooltip-based Icon Targeting */
+.ar [data-tooltip*="Archive"] svg,
+.ar [data-tooltip*="Delete"] svg,
+.ar [data-tooltip*="Mark"] svg,
+.ar [data-tooltip*="Snooze"] svg,
+.ar [data-tooltip*="More"] svg,
+.G-Ni [aria-label*="Archive"] svg,
+.G-Ni [aria-label*="Delete"] svg,
+.G-Ni [aria-label*="Mark"] svg,
+.G-Ni [aria-label*="Snooze"] svg,
+.G-Ni [aria-label*="More"] svg,
+.aeN [aria-label*="Archive"] svg,
+.aeN [aria-label*="Delete"] svg,
+.aeN [aria-label*="Mark"] svg,
+.aeN [aria-label*="Snooze"] svg,
+.aeN [aria-label*="More"] svg {
   filter: brightness(0) invert(1) !important;
 }
 
@@ -163,24 +167,27 @@ svg[data-icon-name="label"],
 .docs-icon-img,
 .goog-toolbar-button .docs-icon,
 .goog-toolbar-menu-button .docs-icon,
-.menu-button .docs-icon,
-.goog-menu-button .docs-icon,
-[role="button"] .docs-icon,
 .docs-toolbar .docs-icon,
 .kix-toolbar .docs-icon,
 .docs-material .docs-icon,
 .docs-material-button .docs-icon,
-/* SVG icons in Google Docs */
+/* SVG icons in Google Docs - More specific targeting */
 .docs-toolbar svg,
 .kix-toolbar svg,
 .docs-material svg,
 .goog-toolbar-button svg,
 .goog-toolbar-menu-button svg,
-.menu-button svg,
-.goog-menu-button svg,
-[role="button"] svg:not([data-exclude-icon]),
 .docs-titlebar svg,
 .docs-omnibox svg,
+/* Google Docs specific menu buttons */
+.docs-material .menu-button svg,
+.docs-toolbar .menu-button svg,
+.docs-material .goog-menu-button svg,
+.docs-toolbar .goog-menu-button svg,
+/* Google Docs specific role buttons */
+.docs-material [role="button"] svg:not([data-exclude-icon]),
+.docs-toolbar [role="button"] svg:not([data-exclude-icon]),
+.kix-toolbar [role="button"] svg:not([data-exclude-icon]),
 /* Dark Reader inspired specific Google Docs elements */
 .punch-filmstrip-controls-icon,
 .docs-homescreen-icon,
