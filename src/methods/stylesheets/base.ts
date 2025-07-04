@@ -158,6 +158,194 @@ svg[data-icon-name="label"],
   filter: brightness(0) invert(1) !important;
 }
 
+/* Google Docs Toolbar Icons Only - No Background Changes */
+.docs-icon,
+.docs-icon-img,
+.goog-toolbar-button .docs-icon,
+.goog-toolbar-menu-button .docs-icon,
+.menu-button .docs-icon,
+.goog-menu-button .docs-icon,
+[role="button"] .docs-icon,
+.docs-toolbar .docs-icon,
+.kix-toolbar .docs-icon,
+.docs-material .docs-icon,
+.docs-material-button .docs-icon,
+/* SVG icons in Google Docs */
+.docs-toolbar svg,
+.kix-toolbar svg,
+.docs-material svg,
+.goog-toolbar-button svg,
+.goog-toolbar-menu-button svg,
+.menu-button svg,
+.goog-menu-button svg,
+[role="button"] svg:not([data-exclude-icon]),
+.docs-titlebar svg,
+.docs-omnibox svg,
+/* Dark Reader inspired specific Google Docs elements */
+.punch-filmstrip-controls-icon,
+.docs-homescreen-icon,
+.kix-equation-toolbar-icon,
+.kix-equation-toolbar-palette-icon,
+.docs-instant-button-bubble-icon-container,
+.docs-preview-palette-item,
+.goog-menuitem-checkbox,
+.goog-dimension-picker-unhighlighted,
+.goog-dimension-picker-highlighted,
+#docs-star,
+.rs-role-icon,
+.toggle-link-icon,
+.link-management-drop-down-icon,
+.vs-icon,
+.vpc-icon,
+.docs-analytics-img,
+.share-butter-copy-icon,
+.exportUnderline,
+.freebirdMaterialIconIconEl,
+.quantumWizTogglePapercheckboxCheckMark,
+#docs-titlebar-share-client-button .scb-button-icon:not([class*="white"]),
+.docs-gm .docos-icon-overflow-three-dots-size,
+/* Specific Google Docs UI selectors */
+.docs-icon-bold,
+.docs-icon-italic,
+.docs-icon-underline,
+.docs-icon-text-color,
+.docs-icon-highlight-color,
+.docs-icon-align-left,
+.docs-icon-align-center,
+.docs-icon-align-right,
+.docs-icon-numbered-list,
+.docs-icon-bullet-list,
+.docs-icon-indent-decrease,
+.docs-icon-indent-increase,
+.docs-icon-link,
+.docs-icon-image,
+.docs-icon-comment,
+.docs-icon-suggestion-mode,
+.docs-icon-editing-mode,
+.docs-icon-viewing-mode {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Google Docs Document Background - Effective Approach */
+.kix-canvas-tile-content[style*="background-color: rgb(255, 255, 255)"],
+.kix-canvas-tile-content[style*="background-color: rgb(249, 251, 253)"],
+.kix-appview-editor,
+.kix-appview-editor[style*="background-color: rgb(255, 255, 255)"],
+.kix-appview-editor[style*="background-color: rgb(249, 251, 253)"],
+.kix-canvas-tile-content {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Google Docs Canvas Content */
+.kix-canvas-tile-content {
+  background: transparent !important;
+  background-size: contain !important;
+}
+
+/* Google Docs Document Area */
+.kix-page-paginated,
+.kix-page-content-wrap,
+.kix-paginateddocumentplugin,
+#docs-editor-container,
+#docs-editor {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Google Docs SVG White Fills */
+.kix-canvas-tile-content rect[fill="rgba(255,255,255,1)"],
+.kix-canvas-tile-content rect[fill="rgb(255,255,255)"],
+.kix-canvas-tile-content rect[fill="#ffffff"],
+.kix-canvas-tile-content rect[fill="white"],
+.kix-canvas-tile-content rect[fill="#f9fbfd"],
+.kix-canvas-tile-content rect[fill="rgb(249,251,253)"] {
+  fill: transparent !important;
+}
+
+/* Google Docs Document Container */
+#contents > div {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Google Docs Page Background Override */
+.kix-page {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Google Docs Body Background */
+body.docs-body-pageless,
+body.docs-body {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Google Docs Text Elements - Invert Approach */
+#docs-editor canvas,
+.kix-canvas-tile-content,
+.kix-canvas-tile-content text,
+.kix-canvas-tile-content svg text,
+.docs-texteventtarget-iframe,
+.docs-text-ui-cursor-blink,
+/* Google Docs Specific Text Elements */
+.kix-lineview,
+.kix-lineview-text-block,
+.kix-wordhtmlgenerator-word-node {
+  filter: invert(1) !important;
+}
+
+/* Google Docs Title Input */
+input.docs-title-input,
+.docs-title-input {
+  background-color: transparent !important;
+  color: ${default_foreground_color} !important;
+}
+
+/* Google Docs Cursor */
+.kix-cursor-caret {
+  border-color: ${default_foreground_color} !important;
+}
+
+/* Google Docs Toolbar Text Elements */
+.goog-flat-menu-button-caption,
+/* Google Docs Menu Bar (File, Edit, View, etc.) - More Specific */
+.docs-menubar-item,
+.docs-menubar-item *,
+.goog-menubar-item,
+.goog-menubar-item *,
+.goog-menubar-item-label,
+.goog-menubar-item-caption,
+.docs-menubar-label,
+.docs-menubar-caption,
+/* Menu bar containers */
+.docs-menubar,
+.docs-menubar *,
+.goog-menubar,
+.goog-menubar *,
+.docs-material-menubar,
+.docs-material-menubar *,
+.docs-material-menubar-item,
+.docs-material-menubar-item *,
+/* Menu button captions */
+.goog-menu-button-caption,
+.goog-menu-button-caption *,
+.docs-menu-button-caption,
+.docs-menu-button-caption *,
+/* Additional menu selectors */
+[role="menubar"],
+[role="menubar"] *,
+[role="menuitem"],
+[role="menuitem"] *,
+/* Google Docs specific menu elements */
+.goog-flat-menu-button,
+.goog-flat-menu-button *,
+.docs-material-menu-button,
+.docs-material-menu-button * {
+  color: ${default_foreground_color} !important;
+}
+
 /* Gmail Sidebar Images */
 .TK .nZ img,
 .TK .TO img,
@@ -172,23 +360,6 @@ svg[data-icon-name="label"],
 /* Gmail Navigation Elements */
 .TK .n6 *:not(img) {
   filter: brightness(0) invert(1) !important;
-}
-
-/* Content Images - Exclude from Icon Filtering */
-img,
-[role="img"],
-.aXq img,
-.go img,
-.yW img,
-.aZo img,
-[data-hovercard-id] img,
-.bzc img,
-[aria-label*="Profile"] img,
-[aria-label*="profile"] img,
-[title*="Profile"] img,
-[title*="profile"] img,
-.aKw img {
-  filter: none !important;
 }
 
 /* Transparent Backgrounds */
